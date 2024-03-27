@@ -2,6 +2,10 @@ from django.db import models
 
 # Create your models here.
 
+class Tags(models.Model):
+    title  = models.CharField(max_length=30)
+    is_deleted = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
 class TodoList(models.Model):
     PRIORITIES = {
         "1":"Low",
@@ -15,11 +19,8 @@ class TodoList(models.Model):
     is_completed=models.BooleanField(default=False)
     is_deleted=models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True) 
+    tags = models.ForeignKey(Tags, on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
         return self.title
 
-class Tags(models.Model):
-    title  = models.CharField(max_length=30)
-    is_deleted = models.BooleanField(default=False)
-    created_at = models.DateTimeField(auto_now_add=True)
