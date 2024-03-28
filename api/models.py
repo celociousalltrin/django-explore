@@ -1,9 +1,11 @@
 from django.db import models
+from django.core.validators import MaxValueValidator, MinValueValidator
+
 
 # Create your models here.
 
 class Tags(models.Model):
-    title  = models.CharField(max_length=30)
+    title  = models.CharField(max_length=1)
     is_deleted = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 

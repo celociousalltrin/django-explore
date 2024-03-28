@@ -12,17 +12,8 @@ from .serializers import TodoListSerializer,TagListSerializer
 def get_list(request):
     list = TodoList.objects.all()
 
-    myList = TodoList.objects.first()
-    
-
-    myTags = Tags.objects.get(id=1).tag.all()
-    serialtag = TodoListSerializer(myTags,many=True)
-
-    print("aaaaaaaaaaaa",serialtag.data)
-
     serialier = TodoListSerializer(list,many=True)
     return Response(serialier.data)
-
 
 
 @api_view(["GET"])
@@ -31,6 +22,8 @@ def single_list_details(request,id):
         single_list = TodoList.objects.get(pk=id)
     except:
         return Response(status=status.HTTP_404_NOT_FOUND)
+
+    
     
     if single_list.tags:
         tag_data = {
@@ -101,6 +94,8 @@ def create_tag(request):
     if serializer.is_valid():
         serializer.save()
         return Response(serializer.data,status=status.HTTP_201_CREATED)
+    else:
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(["GET"])
