@@ -11,15 +11,18 @@ from .serializers import TodoListSerializer,TagListSerializer
 @api_view(["GET"])
 def get_list(request):
     list = TodoList.objects.all()
+
+    myList = TodoList.objects.first()
     
+
+    myTags = Tags.objects.get(id=1).tag.all()
+    serialtag = TodoListSerializer(myTags,many=True)
+
+    print("aaaaaaaaaaaa",serialtag.data)
+
     serialier = TodoListSerializer(list,many=True)
     return Response(serialier.data)
 
-@api_view(["GET"])
-def filtered_list(request):
-    list = TodoList.objects.filter(is_deleted=False)
-    serialier = TodoListSerializer(list,many=True)
-    return Response(serialier.data)
 
 
 @api_view(["GET"])
@@ -29,9 +32,24 @@ def single_list_details(request,id):
     except:
         return Response(status=status.HTTP_404_NOT_FOUND)
     
+    if single_list.tags:
+        tag_data = {
+            'id': single_list.tags.id,
+            'title': single_list.tags.title
+        }
+    else:
+        tag_data = None
+    
     result = TodoListSerializer(single_list)
 
-    return Response(result.data)
+    data = {
+        'todo_list': result.data,
+        'tag': tag_data
+    }
+
+    return Response(data)
+
+
 
 @api_view(["POST"])
 def create_list(request):
