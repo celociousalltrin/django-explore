@@ -5,17 +5,17 @@ from .models import TodoList
 from .models import Tags
 from .serializers import TodoListSerializer,TagListSerializer
 from utils.responseHandler import success_response,errorResponse
-from utils.common import get_child_data, handleError,generate_filter_query
-
+from utils.common import handleError,generate_filter_query
 
 # Create your views here.
 @api_view(["GET"])
 def get_list(request):
+
     try:
         if request.GET:
-           list = TodoList.objects.filter(**generate_filter_query(request.GET,["priority","date","is_completed"]))
+           list = TodoList.objects.filter(**generate_filter_query(request.GET,["priority","date","is_completed"])).select_related("tags").all()
         else:
-           list = TodoList.objects.all()
+           list = TodoList.objects.select_related("tags").all()
 
         serialier = TodoListSerializer(list,many=True)
         return success_response(serialier.data,"OK001")
@@ -30,11 +30,7 @@ def single_list_details(request,id):
     try:
         single_list = TodoList.objects.get(pk=id)
         serialier = TodoListSerializer(single_list)
-
-        tag_data = get_child_data(single_list.tags,["title","id","is_deleted"])
-       
-        data = {'todo_list':serialier.data,"tag":tag_data}
-        return success_response(data,"OK001")
+        return success_response(serialier.data,"OK001")
     except Exception as e:
         print("Error:",e)
         return errorResponse()
@@ -100,6 +96,17 @@ def tag_list(request):
     list = Tags.objects.all()
     serialier = TagListSerializer(list,many=True)
     return Response(serialier.data)
+
+@api_view(["GET"])
+def single_tag(request,id):
+    try:
+        todos = TodoList.objects.filter(tags=id)
+        serializer = TodoListSerializer(todos,many=True)
+
+        return success_response(serializer.data,"OK001")
+    except Exception as e:
+        print("Error:",e)
+        return errorResponse()
 
 
 @api_view(["PUT"])
