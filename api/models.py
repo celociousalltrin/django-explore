@@ -1,6 +1,6 @@
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
-
+from datetime import date
 
 # Create your models here.
 
@@ -13,17 +13,18 @@ class Tags(models.Model):
         return self.title
         
 class TodoList(models.Model):
-    PRIORITIES = {
-        "1":"Low",
-        "2":"Medium",
-        "3":"High"
-    }
+    PRIORITIES = [
+     ("low","Low"),
+     ("medium","Medium"),
+     ("high","High")
+    ]
 
     title = models.CharField(max_length=30)
     description = models.TextField()
-    priority= models.CharField(max_length=1,choices=PRIORITIES,default=PRIORITIES["1"])
+    priority= models.CharField(max_length=6,choices=PRIORITIES,default="low")
     is_completed=models.BooleanField(default=False)
     is_deleted=models.BooleanField(default=False)
+    date=models.DateField(default=date.today())
     created_at = models.DateTimeField(auto_now_add=True) 
     tags = models.ForeignKey(Tags, on_delete=models.SET_NULL, null=True, blank=True, related_name="tag")
 

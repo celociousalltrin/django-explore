@@ -5,15 +5,28 @@ from .models import TodoList
 from .models import Tags
 from .serializers import TodoListSerializer,TagListSerializer
 from utils.responseHandler import success_response,errorResponse,not_found_response 
-from utils.common import get_child_data, handleError
+from utils.common import get_child_data, handleError,generate_filter_query
 from rest_framework.exceptions import ValidationError
+from datetime import date,timedelta
 
 # Create your views here.
 @api_view(["GET"])
 def get_list(request):
-    list = TodoList.objects.all()
-    serialier = TodoListSerializer(list,many=True)
-    return success_response(serialier.data,"OK001")
+    try:
+        if request.GET:
+           list = TodoList.objects.filter(**generate_filter_query(request.GET,["priority","date","is_completed"]))
+        else:
+           list = TodoList.objects.all()
+
+        serialier = TodoListSerializer(list,many=True)
+        return success_response(serialier.data,"OK001")
+
+    except Exception as e:
+        print("Error:",e)
+        return errorResponse()
+        
+
+    
 
 
 @api_view(["GET"])
