@@ -4,10 +4,9 @@ from rest_framework import status
 from .models import TodoList
 from .models import Tags
 from .serializers import TodoListSerializer,TagListSerializer
-from utils.responseHandler import success_response,errorResponse,not_found_response 
+from utils.responseHandler import success_response,errorResponse
 from utils.common import get_child_data, handleError,generate_filter_query
-from rest_framework.exceptions import ValidationError
-from datetime import date,timedelta
+
 
 # Create your views here.
 @api_view(["GET"])
@@ -25,9 +24,6 @@ def get_list(request):
         print("Error:",e)
         return errorResponse()
         
-
-    
-
 
 @api_view(["GET"])
 def single_list_details(request,id):

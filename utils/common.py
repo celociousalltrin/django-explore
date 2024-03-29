@@ -49,10 +49,10 @@ def generic_fn(key,value):
     return {key:value}
     
 
-def generate_filter_query(searchQuery,list_field):
+def generate_filter_query(searchQuery,keys):
     query = {}
     for key in searchQuery:
-        if key in list_field:
+        if key in keys:
             if key == "date":
                 query.update(get_date_range(searchQuery.get(key)))
             else:
