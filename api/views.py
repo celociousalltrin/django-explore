@@ -5,7 +5,8 @@ from .models import TodoList
 from .models import Tags
 from .serializers import TodoListSerializer,TagListSerializer
 from utils.responseHandler import success_response,errorResponse,not_found_response 
-from utils.common import get_child_data
+from utils.common import get_child_data, handleError
+from rest_framework.exceptions import ValidationError
 
 # Create your views here.
 @api_view(["GET"])
@@ -32,27 +33,28 @@ def single_list_details(request,id):
 
 @api_view(["POST"])
 def create_list(request):
-    serializer = TodoListSerializer(data=request.data)
-
-    if serializer.is_valid():
+    try:
+        serializer = TodoListSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
         serializer.save()
+
         return Response(serializer.data,status=status.HTTP_201_CREATED)
+    
+    except Exception as e:
+        return handleError(e)
 
 
 @api_view(["PUT"])
 def update_list(request,id):
     try:
         single_list = TodoList.objects.get(pk=id)
-    except:
-        return Response(status=status.HTTP_404_NOT_FOUND)
-    
-    serializer = TodoListSerializer(single_list,data=request.data,partial=True)
-
-    if serializer.is_valid():
+        serializer = TodoListSerializer(single_list,data=request.data,partial=True)
+        serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response(serializer.data)
-    else:
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(serializer.data,status=status.HTTP_202_ACCEPTED)
+    except Exception as e:
+        return handleError(e)
 
 
 @api_view(["PUT"])

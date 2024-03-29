@@ -19,7 +19,7 @@ class TodoList(models.Model):
         "3":"High"
     }
 
-    title = models.CharField(max_length=30)
+    title = models.CharField(max_length=2)
     description = models.TextField()
     priority= models.CharField(max_length=1,choices=PRIORITIES,default=PRIORITIES["1"])
     is_completed=models.BooleanField(default=False)
