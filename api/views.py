@@ -4,44 +4,30 @@ from rest_framework import status
 from .models import TodoList
 from .models import Tags
 from .serializers import TodoListSerializer,TagListSerializer
-
-
+from utils.responseHandler import success_response,errorResponse,not_found_response 
+from utils.common import get_child_data
 
 # Create your views here.
 @api_view(["GET"])
 def get_list(request):
     list = TodoList.objects.all()
-
     serialier = TodoListSerializer(list,many=True)
-    return Response(serialier.data)
+    return success_response(serialier.data,"OK001")
 
 
 @api_view(["GET"])
 def single_list_details(request,id):
     try:
         single_list = TodoList.objects.get(pk=id)
-    except:
-        return Response(status=status.HTTP_404_NOT_FOUND)
+        serialier = TodoListSerializer(single_list)
 
-    
-    
-    if single_list.tags:
-        tag_data = {
-            'id': single_list.tags.id,
-            'title': single_list.tags.title
-        }
-    else:
-        tag_data = None
-    
-    result = TodoListSerializer(single_list)
-
-    data = {
-        'todo_list': result.data,
-        'tag': tag_data
-    }
-
-    return Response(data)
-
+        tag_data = get_child_data(single_list.tags,["title","id","is_deleted"])
+       
+        data = {'todo_list':serialier.data,"tag":tag_data}
+        return success_response(data,"OK001")
+    except Exception as e:
+        print("Error:",e)
+        return errorResponse()
 
 
 @api_view(["POST"])
