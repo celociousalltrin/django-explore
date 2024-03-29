@@ -60,3 +60,12 @@ def generate_filter_query(searchQuery,keys):
         else:
             raise Exception("The search query is not in the provided List")
     return query
+
+
+def is_Valid(db,query):
+    result = db.objects.filter(**query)
+    if result:
+        return False
+    else:
+        return True
+    

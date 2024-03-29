@@ -5,7 +5,7 @@ from .models import TodoList
 from .models import Tags
 from .serializers import TodoListSerializer,TagListSerializer
 from utils.responseHandler import success_response,errorResponse
-from utils.common import handleError,generate_filter_query
+from utils.common import handleError,generate_filter_query,is_Valid
 
 # Create your views here.
 @api_view(["GET"])
@@ -128,16 +128,15 @@ def update_tag(request,id):
 @api_view(["PUT"])
 def delete_tag(request,id):
     try:
+        if not is_Valid(TodoList,{"tags":id}):
+            return errorResponse("ER902")
+        
         single_tag = Tags.objects.get(pk=id)
-    except:
-        return Response(status=status.HTTP_404_NOT_FOUND)
-    
-    serializer = TagListSerializer(single_tag,data=request.data,partial=True)
-
-    if serializer.is_valid():
+        serializer = TagListSerializer(single_tag,data=request.data,partial=True)
+ 
+        serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response(serializer.data)
-    else:
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
+        return Response(serializer.data,status=status.HTTP_202_ACCEPTED)
+    except Exception as e:
+        return handleError(e)
 
